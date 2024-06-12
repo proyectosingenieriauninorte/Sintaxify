@@ -31,7 +31,8 @@ Como una aplicación web, Sintaxify es accesible desde cualquier lugar, facilita
 
 * Abre tu terminal.
 * Clona el repositorio usando el siguiente comando:
-git clone https://github.com/estebanramirez13/Sintaxify.git
+git clone
+https://github.com/ndelarans/Sintaxify
 
 * Navega al directorio del repositorio clonado:
 cd Sintaxify
