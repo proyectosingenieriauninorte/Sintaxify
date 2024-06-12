@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SINTAXIFY</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .input-section {
+        text-align: center; 
+    }
+    #productions {
+        width: 70%; 
+        margin: 0 auto; 
+    }
+        textarea {
+            width: 100%;
+            height: 100px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+        }
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: 300px; 
+            margin-right: 40px;
+        }
+        .hr-black {
+            border: 0;
+            height: 2px;
+            background-color: #000;
+            width: 100%; 
+        }
+        .header {
+            text-align: center; 
+        }
+        .header h1 {
+            font-size: 28px; 
+        }
+        .example-gic {
+            float: left; 
+            margin-right: 20px; 
+        }
+        .example-gic h2 {
+            margin-top: 0; 
+            font-size: 20px; 
+        }
+        
+        .container {
+        display: flex; 
+        align-items: flex-start; 
+         }
+         .content {
+        width: 20%; 
+        margin-top:60px;
+        margin-left: 220px;
+         }
+        .image-container {
+        width: 80%; 
+        }
+         .image-container img {
+        margin-top:70px;
+        max-width: 100%; 
+        height: auto; 
+        }
+        .output-section {
+        margin-left: 30px; 
+    }
+    #output-productions {
+        font-size: 18px;
+    }
+    .follow-sets-section {
+        margin-left: 30px; 
+    }
+    .containerM {
+        display: flex; 
+    }
+    .content {
+        margin-right: 20px; 
+    }
+    .contenedores0 pre {
+        font-size: 1.2em; 
+    }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://i.ibb.co/VHtjBMc/sintaxify-1.png" alt="SINTAXIFY Logo">
+    </div>
+    <hr class="hr-black">
+    </div>
+</head>
+<body>
+    <div class="header">
+        <h1>Análisis Sintáctico Descendente</h1>
+    </div>
+    <div class="container">
+        <div class="content">
+            <div class="example-gic">
+                <h2>Ejemplo GIC</h2>
+            </div>
+            <div class="productions">
+                <p>.</p>
+                <p>E→E+T</p>
+                <p>E→E-T</p>
+                <p>E→T</p>
+                <p>T→T*F</p>
+                <p>T→T/F</p>
+                <p>T→F</p>
+                <p>F→(E)</p>
+                <p>F→id</p>
+            </div>
+        </div>
+        <div class="image-container">
+            <img src="https://i.ibb.co/v33wRqs/Analisis-sintactico.png" alt="Analisis Sintactico">
+        </div>
+    </div>
+    
+    <div class="input-section">
+        <h2 style="text-align: center;">Ingresar Producciones</h2>
+        <textarea id="productions" placeholder="Ejemplo: S -> aBS'"></textarea>
+        <br><br>
+        <button onclick="procesarGramatica()">Transformar Gramática</button>
+    </div>
+    <div class="output-section">
+        <h3>Producciones Transformadas más izquierda</h3>
+        <pre id="output-productions"></pre>
+        <h3>Primero (First)</h3>
+        <table id="output-first"></table>
+    </div>
+
+    <div class="follow-sets-section" style="display: none;">
+        <div>
+            <h3>Producciones en BNF:</h3>
+            <textarea id="producciones-follow" rows="10" cols="50"></textarea>
+            <br>
+            <button onclick="calcularFollowSets()">Calcular SIGUIENTES</button>
+        </div>
+        <h3>Siguientes (Follow)</h3>
+        <table id="resultados" class="follow-table">
+            <tr>
+                <th>No Terminal</th>
+                <th>Siguiente</th>
+            </tr>
+        </table>
+    </div>
+    <style>
+        h1 {
+            text-align: center; 
+            margin-top: 40px;
+        }
+    </style>
+    <h1>Tabla M</h1>
+<div class="output-section">
+    <h3>Método:</h3>
+    <ol>
+        <li>Para cada producción A-&gt;α de la GIC, dar los pasos 2 y 3.</li>
+        <li>Para cada terminal a de PRIMERO(α), añádase A-&gt;α a M[A,a].</li>
+        <li>Si ε está en PRIMERO(α), añádase A-&gt;α a M[A,b], donde b está en SIGUIENTE(A).</li>
+        <li>Todas las demás entradas de M son errores.</li>
+    </ol>
+    <div class="contenedores0">
+        <div style="display:inline-block; margin-right: 20px;">
+            <h4>Producciones</h4>
+            <pre id="output-productions-m"></pre>
+        </div>
+        <div style="display:inline-block; margin-right: 20px;">
+            <h4>Primero (First)</h4>
+            <pre id="output-first-m"></pre>
+        </div>
+        <div style="display:inline-block;">
+            <h4>Siguiente (Follow)</h4>
+            <div id="output-follow-m"></div>
+        </div>
+    </div>
+    
+</div>
+
+
+    <script>
+        function procesarGramatica() {
+            const input = document.getElementById('productions').value;
+            const producciones = parseProductions(input);
+            const nuevasProducciones = eliminarRecursionIzquierda(producciones);
+            mostrarProducciones(nuevasProducciones);
+            const primeros = calcularPrimero(nuevasProducciones);
+            mostrarPrimero(primeros);
+            mostrarPrimeroM(primeros); 
+
+           
+            document.querySelector('.follow-sets-section').style.display = 'block';
+            document.getElementById('producciones-follow').value = formatProductionsForFollow(nuevasProducciones);
+        }
+
+        function parseProductions(input) {
+            const lines = input.split('\n');
+            const producciones = {};
+            for (const line of lines) {
+                const [noTerminal, reglas] = line.split('->').map(s => s.trim());
+                producciones[noTerminal] = reglas.split('|').map(s => s.trim());
+            }
+            return producciones;
+        }
+
+        function eliminarRecursionIzquierda(producciones) {
+            const nuevasProducciones = {};
+            for (const noTerminal in producciones) {
+                const reglas = producciones[noTerminal];
+                const recursivas = [];
+                const noRecursivas = [];
+                for (const regla of reglas) {
+                    if (regla.startsWith(noTerminal)) {
+                        recursivas.push(regla.slice(noTerminal.length));
+                    } else {
+                        noRecursivas.push(regla);
+                    }
+                }
+                if (recursivas.length > 0) {
+                    const nuevoNoTerminal = noTerminal + "'";
+                    nuevasProducciones[noTerminal] = noRecursivas.map(nr => nr + nuevoNoTerminal);
+                    nuevasProducciones[nuevoNoTerminal] = recursivas.map(r => '' + r + nuevoNoTerminal).concat(['ε']);
+                } else {
+                    nuevasProducciones[noTerminal] = reglas;
+                }
+            }
+            return nuevasProducciones;
+        }
+
+        function mostrarProducciones(producciones) {
+            const output = document.getElementById('output-productions');
+            const outputM = document.getElementById('output-productions-m');
+            output.textContent = '';
+            outputM.textContent = '';
+            for (const noTerminal in producciones) {
+                const reglas = producciones[noTerminal].join(' | ');
+                output.textContent += `${noTerminal} -> ${reglas}\n`;
+                outputM.textContent += `${noTerminal} -> ${reglas}\n`;
+            }
+        }
+
+        function calcularPrimero(producciones) {
+            const primeros = {};
+            for (const noTerminal in producciones) {
+                primeros[noTerminal] = new Set();
+            }
+
+            let cambio = true;
+            while (cambio) {
+                cambio = false;
+                for (const noTerminal in producciones) {
+                    const reglas = producciones[noTerminal];
+                    for (const regla of reglas) {
+                        let simbolo;
+                        if (regla.startsWith('id')) {
+                            simbolo = 'id';
+                        } else {
+                            simbolo = regla[0];
+                        }
+                        if (!producciones[simbolo]) {
+                            if (!primeros[noTerminal].has(simbolo)) {
+                                primeros[noTerminal].add(simbolo);
+                                cambio = true;
+                            }
+                        } else {
+                            const oldSize = primeros[noTerminal].size;
+                            for (const elem of primeros[simbolo]) {
+                                primeros[noTerminal].add(elem);
+                            }
+                            if (primeros[noTerminal].size > oldSize) {
+                                cambio = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (const noTerminal in primeros) {
+                primeros[noTerminal] = Array.from(primeros[noTerminal]);
+            }
+
+            return primeros;
+        }
+
+        function mostrarPrimero(primeros) {
+            const output = document.getElementById('output-first');
+            output.innerHTML = '<tr><th>No Terminal</th><th>Primero</th></tr>';
+            for (const noTerminal in primeros) {
+                const row = document.createElement('tr');
+                const cellNoTerminal = document.createElement('td');
+                cellNoTerminal.textContent = noTerminal;
+                const cellPrimero = document.createElement('td');
+                cellPrimero.textContent = `{${primeros[noTerminal].join(', ')}}`;
+                row.appendChild(cellNoTerminal);
+                row.appendChild(cellPrimero);
+                output.appendChild(row);
+            }
+        }
+
+        function mostrarPrimeroM(primeros) {
+    const output = document.getElementById('output-first-m');
+    output.innerHTML = ''; 
+    for (const noTerminal in primeros) {
+        const resultado = `Prim(${noTerminal}): {${primeros[noTerminal].join(', ')}}`;
+        output.appendChild(document.createTextNode(resultado)); 
+        output.appendChild(document.createElement('br')); 
+    }
+}
+
+
+        function formatProductionsForFollow(productions) {
+            let result = '';
+            for (const noTerminal in productions) {
+                const rules = productions[noTerminal].join(' | ').replace(/'/g, ''); 
+                result += `${noTerminal} -> ${rules}\n`;
+            }
+            return result;
+        }
+
+        function calcularFollowSets() {
+            const input = document.getElementById('producciones-follow');
+            input.value = input.value.replace(/'/g, '');
+
+            const lines = input.value.trim().split('\n').map(line => line.trim());
+
+            const producciones = {};
+
+            lines.forEach(line => {
+                const [nonTerminal, rhs] = line.split('->').map(s => s.trim());
+                producciones[nonTerminal] = rhs.split('|').map(s => s.trim());
+            });
+
+            const noTerminales = Object.keys(producciones);
+            const primeros = {};
+            const siguientes = {};
+
+           
+            noTerminales.forEach(v => {
+                primeros[v] = new Set();
+                siguientes[v] = new Set();
+            });
+
+           
+            siguientes[noTerminales[0]].add('$');
+
+            
+            function calcularPrimeros(cadena) {
+                const resultado = new Set();
+                for (let i = 0; i < cadena.length; i++) {
+                    const simbolo = cadena[i];
+                    if (simbolo === 'ε') {
+                        resultado.add('ε');
+                        break;
+                    }
+                    if (!noTerminales.includes(simbolo)) {
+                        resultado.add(simbolo);
+                        break;
+                    }
+                    const firstSimbolo = primeros[simbolo];
+                    firstSimbolo.forEach(x => {
+                        if (x !== 'ε') resultado.add(x);
+                    });
+                    if (!firstSimbolo.has('ε')) break;
+                    if (i === cadena.length - 1) resultado.add('ε');
+                }
+                return resultado;
+            }
+
+            
+            let cambios;
+            do {
+                cambios = false;
+                noTerminales.forEach(nonTerminal => {
+                    producciones[nonTerminal].forEach(cadena => {
+                        const simbolos = cadena.split('');
+                        const primerosCadena = calcularPrimeros(simbolos);
+                        primerosCadena.forEach(x => {
+                            if (!primeros[nonTerminal].has(x)) {
+                                primeros[nonTerminal].add(x);
+                                cambios = true;
+                            }
+                        });
+                    });
+                });
+            } while (cambios);
+
+           
+            do {
+                cambios = false;
+                noTerminales.forEach(nonTerminal => {
+                    producciones[nonTerminal].forEach(cadena => {
+                        const simbolos = cadena.split('');
+                        for (let i = 0; i < simbolos.length; i++) {
+                            const simbolo = simbolos[i];
+                            if (noTerminales.includes(simbolo)) {
+                                const primerosBeta = calcularPrimeros(simbolos.slice(i + 1));
+                                primerosBeta.forEach(x => {
+                                    if (x !== 'ε' && !siguientes[simbolo].has(x)) {
+                                        siguientes[simbolo].add(x);
+                                        cambios = true;
+                                    }
+                                });
+                                if (primerosBeta.has('ε') || i === simbolos.length - 1) {
+                                    siguientes[nonTerminal].forEach(x => {
+                                        if (!siguientes[simbolo].has(x)) {
+                                            siguientes[simbolo].add(x);
+                                            cambios = true;
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    });
+                });
+            } while (cambios);
+
+          
+            const resultados = document.getElementById('resultados');
+            resultados.innerHTML = '';
+            const headerRow = document.createElement('tr');
+            const headerNoTerminal = document.createElement('th');
+            headerNoTerminal.textContent = 'No Terminal';
+            const headerSiguiente = document.createElement('th');
+            headerSiguiente.textContent = 'Siguiente';
+            headerRow.appendChild(headerNoTerminal);
+            headerRow.appendChild(headerSiguiente);
+            resultados.appendChild(headerRow);
+            noTerminales.forEach((nonTerminal, index) => {
+                const cantidadApariciones = lines.filter(line => line.startsWith(nonTerminal)).length;
+                const cantidadMostrar = cantidadApariciones > 1 ? 2 : 1;
+                for (let i = 0; i < cantidadMostrar; i++) {
+                    const row = document.createElement('tr');
+                    const cellNoTerminal = document.createElement('td');
+                    cellNoTerminal.textContent = i === 0 ? nonTerminal : nonTerminal + "'";
+                    const cellSiguiente = document.createElement('td');
+                    cellSiguiente.textContent = `{${Array.from(siguientes[nonTerminal]).join(', ')}}`;
+                    row.appendChild(cellNoTerminal);
+                    row.appendChild(cellSiguiente);
+                    resultados.appendChild(row);
+                }
+            });
+            const outputFollowM = document.getElementById('output-follow-m');
+noTerminales.forEach(nonTerminal => {
+    const cantidadApariciones = lines.filter(line => line.startsWith(nonTerminal)).length;
+    const cantidadMostrar = cantidadApariciones > 1 ? 2 : 1;
+    
+    const outputRow = document.createElement('div');
+    outputRow.classList.add('output-row');
+    
+    for (let i = 0; i < cantidadMostrar; i++) {
+        const nonTerminalText = i === 0 ? nonTerminal : nonTerminal + "'";
+        const siguienteText = `{${Array.from(siguientes[nonTerminal]).join(', ')}}`;
+        const pElement = document.createElement('p');
+        pElement.textContent = `Sgte(${nonTerminalText}): ${siguienteText}`;
+        outputRow.appendChild(pElement);
+    }
+    outputFollowM.appendChild(outputRow);
+    
+});
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla M</title>
+    <style>
+        .contenedor {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 20vh; 
+        }
+
+        .contenedor-tabla {
+            margin: 0 10px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+            opacity: 0; 
+            animation: aparecer 0.5s forwards; 
+        }
+
+        #tablaM-contenedor {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px; 
+        }
+
+        .popup-explicacion {
+            position: absolute;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            z-index: 1;
+            display: none;
+        }
+
+        .popup-explicacion.mostrar {
+            display: block;
+        }
+
+        @keyframes aparecer {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align: center;">Tabla M</h2>
+    <div class="contenedor">
+        <div class="contenedor-tabla">
+            <label for="producciones">Producciones:</label><br>
+            <textarea id="producciones" rows="4" cols="50"></textarea>
+        </div>
+        <div class="contenedor-tabla">
+            <label for="first">Conjuntos First:</label><br>
+            <textarea id="first" rows="4" cols="50"></textarea>
+        </div>
+        <div class="contenedor-tabla">
+            <label for="follow">Conjuntos Follow:</label><br>
+            <textarea id="follow" rows="4" cols="50"></textarea>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 10px;">
+        <button onclick="generarTabla()">Generar Tabla</button>
+        <button onclick="alternarExplicacion()">Explicación</button>
+    </div>
+
+    <div id="tablaM-contenedor"></div>
+
+    <div id="popup-explicacion" class="popup-explicacion">
+        <span onclick="cerrarExplicacion()" class="cerrar" title="Cerrar Popup">&times;</span>
+        <p>Para crear una producción, sigue estos pasos:</p>
+        <ol>
+            <li>Identifica el no terminal de la producción.</li>
+            <li>Encuentra los símbolos terminales o no terminales que pueden derivar en el no terminal.</li>
+            <li>Utiliza los conjuntos de 'First' y 'Follow' para determinar la producción adecuada.</li>
+        </ol>
+    </div>
+
+    <script>
+        function generarTabla() {
+            const produccionesInput = document.getElementById('producciones').value;
+            const firstInput = document.getElementById('first').value;
+            const followInput = document.getElementById('follow').value;
+
+            const producciones = analizarProducciones(produccionesInput);
+            const first = analizarConjuntos(firstInput);
+            const follow = analizarConjuntos(followInput);
+
+            const noTerminales = Object.keys(producciones);
+            const terminales = obtenerTerminales(producciones);
+
+            const contenedor = document.getElementById('tablaM-contenedor');
+
+            const tabla = document.createElement('table');
+            tabla.setAttribute('id', 'tablaM');
+
+            const cabecera = document.createElement('thead');
+            const cuerpo = document.createElement('tbody');
+
+            const filaEncabezado = document.createElement('tr');
+            filaEncabezado.appendChild(document.createElement('th')); 
+            terminales.forEach(terminal => {
+                const th = document.createElement('th');
+                th.textContent = terminal;
+                filaEncabezado.appendChild(th);
+            });
+            cabecera.appendChild(filaEncabezado);
+
+
+            tabla.appendChild(cabecera);
+
+            contenedor.innerHTML = '';
+            contenedor.appendChild(tabla);
+       
+            noTerminales.forEach((noTerminal, indiceFila) => {
+                const fila = document.createElement('tr');
+                const celda = document.createElement('td');
+                celda.textContent = noTerminal;
+                fila.appendChild(celda);
+
+                setTimeout(() => { 
+                    terminales.forEach((terminal, indiceColumna) => {
+                        setTimeout(() => { 
+                            const celda = document.createElement('td');
+                            celda.textContent = obtenerProduccion(noTerminal, terminal, producciones, first, follow);
+                            fila.appendChild(celda);
+                        }, 100 * indiceColumna); 
+                    });
+
+                    cuerpo.appendChild(fila);
+                }, 200 * indiceFila); 
+            });
+
+            tabla.appendChild(cuerpo);
+        }
+
+        function analizarProducciones(entrada) {
+            const lineas = entrada.split('\n');
+            const resultado = {};
+            lineas.forEach(linea => {
+                const partes = linea.trim().split('->');
+                const noTerminal = partes[0].trim();
+                const producciones = partes[1].trim().split('|').map(p => p.trim());
+                resultado[noTerminal] = producciones;
+            });
+            return resultado;
+        }
+
+        function analizarConjuntos(entrada) {
+            const lineas = entrada.split('\n');
+            const resultado = {};
+            lineas.forEach(linea => {
+                const partes = linea.trim().split(':');
+                const noTerminal = partes[0].replace('Prim(', '').replace('Sgte(', '').replace(')', '').trim();
+                const simbolos = partes[1].replace('{', '').replace('}', '').split(',').map(s => s.trim());
+                resultado[noTerminal] = simbolos;
+            });
+            return resultado;
+        }
+
+        function obtenerTerminales(producciones) {
+            const conjuntoTerminales = new Set();
+            Object.values(producciones).flat().forEach(prod => {
+                const coincidencias = prod.match(/[a-z]+|\S/g);
+                if (coincidencias) {
+                  coincidencias.forEach(char => {
+                        if (!producciones[char] && char !== '\'' && char !== 'ε') {
+                            conjuntoTerminales.add(char);
+                        }
+                    });
+                }
+            });
+            conjuntoTerminales.delete('$');
+            const arrayTerminales = Array.from(conjuntoTerminales).sort();
+            arrayTerminales.push('$');
+            return arrayTerminales;
+        }
+
+        function obtenerProduccion(noTerminal, terminal, producciones, first, follow) {
+            const produccionesNoTerminal = producciones[noTerminal];
+            const conjuntoFirst = first[noTerminal];
+            const conjuntoFollow = follow[noTerminal];
+
+            for (const produccion of produccionesNoTerminal) {
+                if (produccion.startsWith(terminal)) { 
+                    return `${noTerminal} → ${produccion}`;
+                }
+
+                const primerSimboloProduccion = first[produccion[0]]; 
+                if (primerSimboloProduccion && primerSimboloProduccion.includes(terminal)) {
+                    return `${noTerminal} → ${produccion}`;
+                }
+
+                if (produccion === 'ε' && conjuntoFollow.includes(terminal)) {
+                    return `${noTerminal} → ε`;
+                }
+
+                if (!noTerminal.includes(terminal) && terminal === produccion) {
+                    return `${noTerminal} → ${produccion}`;
+                }
+            }
+
+            return '';
+        }
+
+        function alternarExplicacion() {
+            const popupExplicacion = document.getElementById('popup-explicacion');
+            popupExplicacion.classList.toggle('mostrar');
+        }
+
+        function cerrarExplicacion() {
+            const popupExplicacion = document.getElementById('popup-explicacion');
+            popupExplicacion.classList.remove('mostrar');
+        }
+    </script>
+</body>
+</html>
