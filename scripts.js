@@ -277,11 +277,21 @@ function calcularFollowSets() {
 }
 
 function generarTabla() {
-    const produccionesInput = document.getElementById('producciones').value;
-    const firstInput = document.getElementById('first').value;
-    const followInput = document.getElementById('follow').value;
+    const produccionesInput = document.getElementById('producciones').value.trim();
+    if (!produccionesInput) {
+        console.error("No productions entered");
+        return;
+    }
+
+    const firstInput = document.getElementById('first').value.trim();
+    const followInput = document.getElementById('follow').value.trim();
 
     const producciones = analizarProducciones(produccionesInput);
+    if (Object.keys(producciones).length === 0) {
+        console.error("Failed to parse productions");
+        return;
+    }
+    
     const first = analizarConjuntos(firstInput);
     const follow = analizarConjuntos(followInput);
 
@@ -332,11 +342,21 @@ function generarTabla() {
     tabla.appendChild(cuerpo);
 }
 
+
 function analizarProducciones(entrada) {
+    if (!entrada || typeof entrada !== 'string') {
+        console.error("Invalid input for productions");
+        return {};
+    }
     const lineas = entrada.split('\n');
     const resultado = {};
     lineas.forEach(linea => {
+        if (linea.trim() === "") return; // Skip empty lines
         const partes = linea.trim().split('->');
+        if (partes.length < 2) {
+            console.error("Malformed production rule:", linea);
+            return;
+        }
         const noTerminal = partes[0].trim();
         const producciones = partes[1].trim().split('|').map(p => p.trim());
         resultado[noTerminal] = producciones;
@@ -347,14 +367,40 @@ function analizarProducciones(entrada) {
 function analizarConjuntos(entrada) {
     const lineas = entrada.split('\n');
     const resultado = {};
+
     lineas.forEach(linea => {
-        const partes = linea.trim().split(':');
-        const noTerminal = partes[0].replace('Prim(', '').replace('Sgte(', '').replace(')', '').trim();
-        const simbolos = partes[1].replace('{', '').replace('}', '').split(',').map(s => s.trim());
+        linea = linea.trim();
+        if (!linea) return; // Skip empty lines
+
+        const partes = linea.split(':');
+        if (partes.length < 2) {
+            console.error("Malformed input line:", linea);
+            return;
+        }
+
+        const noTerminal = partes[0]
+            .replace('Prim(', '')
+            .replace('Sgte(', '')
+            .replace(')', '')
+            .trim();
+
+        if (!partes[1]) {
+            console.error("Missing symbols for non-terminal:", noTerminal);
+            return;
+        }
+
+        const simbolos = partes[1]
+            .replace('{', '')
+            .replace('}', '')
+            .split(',')
+            .map(s => s.trim());
+
         resultado[noTerminal] = simbolos;
     });
+
     return resultado;
 }
+
 
 function obtenerTerminales(producciones) {
     const conjuntoTerminales = new Set();
