@@ -185,27 +185,27 @@ function calcularFollowSets() {
         }
         return resultado;
     }
-
+    
     let cambios;
     do {
         cambios = false;
-        noTerminales.forEach(nonTerminal => {
+        noTerminales.forEach(nonTerminal => { // Ensure consistent naming here
             producciones[nonTerminal].forEach(cadena => {
                 const simbolos = cadena.split('');
                 const primerosCadena = calcularPrimeros(simbolos);
                 primerosCadena.forEach(x => {
-                    if (!primeros[nonTerminal].has(x)) {
-                        primeros[noTerminal].add(x);
+                    if (!primeros[nonTerminal].has(x)) { // Use nonTerminal consistently
+                        primeros[nonTerminal].add(x);  // Use nonTerminal consistently
                         cambios = true;
                     }
                 });
             });
         });
     } while (cambios);
-
+    
     do {
         cambios = false;
-        noTerminales.forEach(nonTerminal => {
+        noTerminales.forEach(nonTerminal => { // Ensure consistent naming here
             producciones[nonTerminal].forEach(cadena => {
                 const simbolos = cadena.split('');
                 for (let i = 0; i < simbolos.length; i++) {
@@ -219,7 +219,7 @@ function calcularFollowSets() {
                             }
                         });
                         if (primerosBeta.has('ε') || i === simbolos.length - 1) {
-                            siguientes[nonTerminal].forEach(x => {
+                            siguientes[nonTerminal].forEach(x => { // Use nonTerminal consistently
                                 if (!siguientes[simbolo].has(x)) {
                                     siguientes[simbolo].add(x);
                                     cambios = true;
@@ -231,7 +231,7 @@ function calcularFollowSets() {
             });
         });
     } while (cambios);
-
+    
     const resultados = document.getElementById('resultados');
     resultados.innerHTML = '';
     const headerRow = document.createElement('tr');
@@ -242,7 +242,7 @@ function calcularFollowSets() {
     headerRow.appendChild(headerNoTerminal);
     headerRow.appendChild(headerSiguiente);
     resultados.appendChild(headerRow);
-    noTerminales.forEach((nonTerminal, index) => {
+    noTerminales.forEach((nonTerminal, index) => { // Ensure consistent naming here
         const cantidadApariciones = lines.filter(line => line.startsWith(nonTerminal)).length;
         const cantidadMostrar = cantidadApariciones > 1 ? 2 : 1;
         for (let i = 0; i < cantidadMostrar; i++) {
@@ -250,31 +250,31 @@ function calcularFollowSets() {
             const cellNoTerminal = document.createElement('td');
             cellNoTerminal.textContent = i === 0 ? nonTerminal : nonTerminal + "'";
             const cellSiguiente = document.createElement('td');
-            cellSiguiente.textContent = `{${Array.from(siguientes[nonTerminal]).join(', ')}}`;
+            cellSiguiente.textContent = `{${Array.from(siguientes[nonTerminal]).join(', ')}}`; // Use nonTerminal consistently
             row.appendChild(cellNoTerminal);
             row.appendChild(cellSiguiente);
             resultados.appendChild(row);
         }
     });
-
+    
     const outputFollowM = document.getElementById('output-follow-m');
-    noTerminales.forEach(nonTerminal => {
+    noTerminales.forEach(nonTerminal => { // Ensure consistent naming here
         const cantidadApariciones = lines.filter(line => line.startsWith(nonTerminal)).length;
         const cantidadMostrar = cantidadApariciones > 1 ? 2 : 1;
-        
+    
         const outputRow = document.createElement('div');
         outputRow.classList.add('output-row');
-        
+    
         for (let i = 0; i < cantidadMostrar; i++) {
             const nonTerminalText = i === 0 ? nonTerminal : nonTerminal + "'";
-            const siguienteText = `{${Array.from(siguientes[nonTerminal]).join(', ')}}`;
+            const siguienteText = `{${Array.from(siguientes[nonTerminal]).join(', ')}}`; // Use nonTerminal consistently
             const pElement = document.createElement('p');
             pElement.textContent = `Sgte(${nonTerminalText}): ${siguienteText}`;
             outputRow.appendChild(pElement);
         }
         outputFollowM.appendChild(outputRow);
     });
-}
+} 
 
 function generarTabla() {
     const produccionesInput = document.getElementById('producciones').value.trim();
