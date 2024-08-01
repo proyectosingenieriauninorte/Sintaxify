@@ -8,6 +8,7 @@ body {
 #productions {
     width: 70%; 
     margin: 0 auto; 
+    height: 300px;
 }
 textarea {
     width: 100%;

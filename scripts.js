@@ -1,5 +1,11 @@
 function procesarGramatica() {
-    const input = document.getElementById('productions').value;
+    let input = document.getElementById('productions').value;
+
+    // Remove extra spaces and blank lines
+    input = input.replace(/^\s*$(?:\r\n?|\n)/gm, ''); // Remove blank lines
+    input = input.trim(); // Remove leading and trailing spaces
+
+
     const producciones = parseProductions(input);
     const nuevasProducciones = eliminarRecursionIzquierda(producciones);
     mostrarProducciones(nuevasProducciones);
