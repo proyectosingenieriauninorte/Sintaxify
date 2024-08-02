@@ -31,8 +31,7 @@ Como una aplicación web, Sintaxify es accesible desde cualquier lugar, facilita
 
 * Abre tu terminal.
 * Clona el repositorio usando el siguiente comando:
-git clone
-https://github.com/ndelarans/Sintaxify
+git clone https://github.com/proyectosingenieriauninorte/Sintaxify.git
 
 * Navega al directorio del repositorio clonado:
 cd Sintaxify
@@ -70,20 +69,6 @@ Nota: Hay que tener en cuenta que la calculadora unicamnete realiza derivaciones
 * Presiona el botón correspondiente para visualizar los resultados en formato de tabla. Este botón puede llamarse "Ver en Tabla" o algo similar.
 
 * Revisa los resultados mostrados en formato de tabla en la página.
-
-
-Funcionalidades Futuras
-Soporte para Gramáticas Aumentadas:
-
-Implementar la funcionalidad para trabajar con gramáticas aumentadas, lo que permitirá una mayor flexibilidad y potencia en el análisis sintáctico.
-
-Análisis Sintáctico Descendente:
-
-Mejorar el soporte existente para el análisis sintáctico descendente LL(1), incorporando más ejemplos interactivos y casos de estudio para un aprendizaje más profundo y aplicado.
-
-Visualización de Árboles de Derivación:
-
-Añadir una funcionalidad para generar y visualizar árboles de derivación a partir de las gramáticas y cadenas de entrada proporcionadas, facilitando una comprensión más visual y detallada del proceso de análisis.
 
 
 Realizado por:
